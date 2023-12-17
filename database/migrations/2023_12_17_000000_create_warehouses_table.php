@@ -13,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('egresos_articulos', function (Blueprint $table) {
+        Schema::create('warehouses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('producto_id')->constrained('productos');
-            $table->foreignId('bodega_id')->constrained('bodegas');
-            $table->integer('cantidad');
-            $table->date('fecha_egreso');
-            $table->text('observaciones')->nullable();
+            $table->string('nombre_bodega');
+            $table->text('descripcion_bodega')->default('No Aplica');
+            $table->text('direccion_bodega')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('egresos_articulos');
+        Schema::dropIfExists('warehouses');
     }
 };
