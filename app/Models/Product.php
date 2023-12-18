@@ -26,8 +26,8 @@ class Product extends Model
 
     public function countInventory()
     {
-        $stockIn = $this->stocks()->where('type', '1')->sum('quantity');
-        $stockOut = $this->stocks()->where('type', '2')->sum('quantity');
+        $stockIn = $this->stocks()->where('tipo', 'entrada')->sum('cantidad');
+        $stockOut = $this->stocks()->where('tipo', 'salida')->sum('cantidad');
 
         return $stockIn - $stockOut;
     }

@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\ListarProductosRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Warehouse;
+use App\Http\Resources\ProductResource;
 
 
 
@@ -71,43 +72,55 @@ class ProductController extends Controller
     }
 
     public function read(ListarProductosRequest $request)
-    {   
-        $columns = ['nombre', 'descripcion', 'precio_unitario', 'warehouse_id','imagen','id'];
+{   
+    $columns = ['nombre', 'descripcion', 'precio_unitario', 'warehouse_id','imagen','id'];
+    $perPage = $request->input('per_page', 10); // Default to 15 items per page if not specified
 
-        try {
-            if (isset($request->limit)){
-                $products = Product::select($columns)
+    try {
+        if (isset($request->limit)) {
+            // Limiting the number of results (might not need pagination)
+            $products = Product::select($columns)
                 ->take($request->limit)
                 ->get();
-            }elseif (isset($request->id)){
-                $products = Product::find($request->id);
-            }
-            elseif (isset($request->nombre)){
-                $products = Product::select($columns)
+        } elseif (isset($request->id)) {
+            // Fetching a single product
+            $products = Product::find($request->id);
+        } elseif (isset($request->nombre)) {
+            // Search by name with pagination
+            $products = Product::select($columns)
                 ->where('nombre', 'like', '%'.$request->nombre.'%')
-                ->get();
-            }
-            elseif (isset($request->precio_unitario)){
-                $products = Product::select($columns)
+                ->paginate($perPage);
+        } elseif (isset($request->precio_unitario)) {
+            // Search by unit price with pagination
+            $products = Product::select($columns)
                 ->where('precio_unitario', '=', $request->precio_unitario)
-                ->get();
-            }
-            else{
-                $products = Product::select($columns)
-                ->get();
+                ->paginate($perPage);
+        } else {
+            // Default case with pagination
+            $products = Product::select($columns)->paginate($perPage);
 
-                // AGREGARLE LA CANTIDAD DE CADA UNO QUE HAY EN STOCK
-            }
-            return response()->json(["msg"=>"Listando", "rsp"=>$products], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                "error" => $th->getMessage(),
-                "linea" => $th->getLine(),
-                "file" => $th->getFile(),
-                "metodo" => __METHOD__
-            ], Response::HTTP_BAD_REQUEST);
+            // You might want to add logic here to append stock quantity
         }
+        if (isset($products)) {
+            return ProductResource::collection($products);
+        }
+
+        // Default case with pagination and inventory count
+        $products = Product::with('warehouse:name,id') // Select only the name and id from the warehouse
+                ->select($columns)
+                ->paginate($perPage);
+                
+        return ProductResource::collection($products);
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            "error" => $th->getMessage(),
+            "linea" => $th->getLine(),
+            "file" => $th->getFile(),
+            "metodo" => __METHOD__
+        ], Response::HTTP_BAD_REQUEST);
     }
+}
 
     public function update(UpdateProductRequest $request)
     {   

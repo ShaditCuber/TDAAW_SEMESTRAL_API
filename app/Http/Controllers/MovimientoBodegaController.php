@@ -7,79 +7,59 @@ use Illuminate\Http\Request;
 
 class MovimientoBodegaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+   public function create(MovimientoRequest $request)
+   {
+         $movimiento = new MovimientoBodega();
+         $movimiento->product_id = $request->product_id;
+         $movimiento->bodega_origen = $request->bodega_origen;
+         $movimiento->bodega_destino = $request->bodega_destino;
+         $movimiento->cantidad = $request->cantidad;
+
+         if (isset($request->observaciones)) {
+              $movimiento->observaciones = $request->observaciones;
+         }
+
+         $movimiento->save();
+         return response()->json([
+              "message" => "Movimiento creado"
+         ], 201);
+   }
+
+    public function read()
     {
-        //
+            return response()->json(MovimientoBodega::all(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    // public function update(MovimientoRequest $request)
+    // {
+    //         $movimiento = MovimientoBodega::where('id', $request->id)->first();
+    //         $movimiento->product_id = $request->product_id;
+    //         $movimiento->bodega_origen = $request->bodega_origen;
+    //         $movimiento->bodega_destino = $request->bodega_destino;
+    //         $movimiento->cantidad = $request->cantidad;
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    //         if (isset($request->observaciones)) {
+    //              $movimiento->observaciones = $request->observaciones;
+    //         }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\MovimientoBodega  $movimientoBodega
-     * @return \Illuminate\Http\Response
-     */
-    public function show(MovimientoBodega $movimientoBodega)
-    {
-        //
-    }
+    //         $movimiento->save();
+    //         return response()->json([
+    //              "message" => "Movimiento actualizado"
+    //         ], 201);
+    // }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\MovimientoBodega  $movimientoBodega
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(MovimientoBodega $movimientoBodega)
+    public function delete(Request $request)
     {
-        //
-    }
+            if (!MovimientoBodega::where('id', $request->id)->exists()) {
+                 return response()->json([
+                      "message" => "Movimiento no encontrado"
+                 ], 404);
+            }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\MovimientoBodega  $movimientoBodega
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, MovimientoBodega $movimientoBodega)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\MovimientoBodega  $movimientoBodega
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(MovimientoBodega $movimientoBodega)
-    {
-        //
+            $movimiento = MovimientoBodega::where('id', $request->id)->first();
+            $movimiento->delete();
+            return response()->json([
+                 "message" => "Movimiento eliminado"
+            ], 201);
     }
 }
