@@ -53,8 +53,9 @@ class ListarProductosRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException(
-            response()->json($validator->errors()->all(), Response::HTTP_BAD_REQUEST)
-        );
+        throw new HttpResponseException(response()->json([
+            'msg' => 'Error de validación',
+            'errors' => $validator->errors()
+        ], Response::HTTP_BAD_REQUEST));
     }
 }

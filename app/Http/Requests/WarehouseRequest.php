@@ -52,10 +52,11 @@ class WarehouseRequest extends FormRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator)
+    public function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException(
-            response()->json($validator->errors()->all(), Response::HTTP_BAD_REQUEST)
-        );
+        throw new HttpResponseException(response()->json([
+            'msg' => 'Error de validación',
+            'errors' => $validator->errors()
+        ], Response::HTTP_BAD_REQUEST));
     }
 }

@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 
-class ListarWarehouseRequest extends FormRequest
+class StockRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,10 +28,10 @@ class ListarWarehouseRequest extends FormRequest
     public function rules()
     {
         return [
-            'limit' => 'nullable|integer',
-            'id' => 'nullable|integer|exists:warehouses,id',
-            'nombre_bodega' => 'nullable|string|max:255',
-            'direccion_bodega' => 'nullable|string|max:255',
+            'product_id' => 'required|exists:products,id',
+            'cantidad' => 'required|integer|min:1',
+            'tipo' => 'required|in:entrada,salida',
+            'observaciones' => 'nullable|string|max:500'
         ];
     }
 
@@ -43,16 +43,23 @@ class ListarWarehouseRequest extends FormRequest
     public function messages()
     {
         return [
-            'limit.integer' => 'El límite debe ser un número entero',
-            'id.integer' => 'El id debe ser un número entero',
-            'id.exists' => 'El id debe existir en la tabla warehouses',
-            'nombre_bodega.string' => 'El nombre de la bodega debe ser un texto',
-            'nombre_bodega.max' => 'El nombre de la bodega debe tener máximo 255 caracteres',
-            'direccion_bodega.string' => 'La dirección de la bodega debe ser un texto',
-            'direccion_bodega.max' => 'La dirección de la bodega debe tener máximo 255 caracteres',
+            'product_id.required' => 'El campo product_id es requerido',
+            'product_id.exists' => 'El campo product_id no existe',
+            'cantidad.required' => 'El campo cantidad es requerido',
+            'cantidad.integer' => 'El campo cantidad debe ser un entero',
+            'cantidad.min' => 'El campo cantidad debe ser mayor a 0',
+            'tipo.required' => 'El campo tipo es requerido',
+            'tipo.in' => 'El campo tipo debe ser entrada o salida',
+            'observaciones.string' => 'El campo observaciones debe ser una cadena de texto',
+            'observaciones.max' => 'El campo observaciones debe tener máximo 500 caracteres'
         ];
     }
 
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, mixed>
+     */
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([

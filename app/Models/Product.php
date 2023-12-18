@@ -19,14 +19,16 @@ class Product extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
-    public function stock()
+    public function stocks()
     {
         return $this->hasMany(Stock::class);
     }
 
-    public function countStock()
+    public function countInventory()
     {
-        return $this->stock()->sum('cantidad');
-    }
+        $stockIn = $this->stocks()->where('type', '1')->sum('quantity');
+        $stockOut = $this->stocks()->where('type', '2')->sum('quantity');
 
+        return $stockIn - $stockOut;
+    }
 }

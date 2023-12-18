@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WarehouseController;
-
+use App\Http\Controllers\StockController;
 
 
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
@@ -32,6 +32,12 @@ Route::middleware('jwt.verify')->group(function () {
         Route::delete('/delete', 'delete');
     });
    
+    Route::prefix('stock')->controller(StockController::class)->group(function () {
+        Route::post('/create', 'create');
+        Route::get('/read', 'read');
+        Route::post('/update', 'update');
+        Route::delete('/delete', 'delete');
+    });
     
 
 });

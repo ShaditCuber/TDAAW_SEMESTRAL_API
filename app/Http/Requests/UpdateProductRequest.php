@@ -61,10 +61,11 @@ class UpdateProductRequest extends FormRequest
     /**
      * @return void
      */
-    protected function failedValidation(Validator $validator)
+    public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'errors' => $validator->errors(),
+            'msg' => 'Error de validación',
+            'errors' => $validator->errors()
         ], Response::HTTP_BAD_REQUEST));
     }
 }

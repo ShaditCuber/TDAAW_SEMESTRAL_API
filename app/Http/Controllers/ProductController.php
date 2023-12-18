@@ -72,7 +72,7 @@ class ProductController extends Controller
 
     public function read(ListarProductosRequest $request)
     {   
-        $columns = ['nombre', 'descripcion', 'precio_unitario', 'warehouse_id','imagen'];
+        $columns = ['nombre', 'descripcion', 'precio_unitario', 'warehouse_id','imagen','id'];
 
         try {
             if (isset($request->limit)){
@@ -95,6 +95,8 @@ class ProductController extends Controller
             else{
                 $products = Product::select($columns)
                 ->get();
+
+                // AGREGARLE LA CANTIDAD DE CADA UNO QUE HAY EN STOCK
             }
             return response()->json(["msg"=>"Listando", "rsp"=>$products], 200);
         } catch (\Throwable $th) {

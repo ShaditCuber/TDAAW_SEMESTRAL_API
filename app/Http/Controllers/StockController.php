@@ -4,82 +4,112 @@ namespace App\Http\Controllers;
 
 use App\Models\Stock;
 use Illuminate\Http\Request;
+use App\Http\Requests\StockRequest; 
+use Symfony\Component\HttpFoundation\Response;
+use App\Http\Requests\ListarStockRequest;
+use App\Models\Product;
+
 
 class StockController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function create(StockRequest $request)
     {
-        //
+        $stock = new Stock();
+        $stock->product_id = $request->product_id;
+        $stock->cantidad = $request->cantidad;
+        $stock->tipo = $request->tipo;
+
+        if(isset($request->observaciones)){
+            $stock->observaciones = $request->observaciones;
+        }
+
+        $stock->save();
+
+        return response()->json([
+            "msg" => "Stock creado",
+            "stock" => $stock
+        ], Response::HTTP_CREATED);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+    public function read(ListarStockRequest $request)
+    {   
+        $columns = [
+        'stocks.id', 
+        'stocks.product_id', 
+        'stocks.cantidad', 
+        'stocks.observaciones', 
+        'stocks.tipo'
+        ];
+       
+        try {
+
+            if (isset($request->product_id)) {
+            // Obtén los detalles del producto y calcula la cantidad total
+            $productDetails = Product::where('id', $request->product_id)
+                ->select('id', 'nombre', 'descripcion', 'precio_unitario', 'warehouse_id', 'imagen')
+                ->with(['stocks' => function($query) {
+                    $query->selectRaw('product_id, SUM(CASE WHEN tipo = "entrada" THEN cantidad ELSE -cantidad END) as total')
+                          ->groupBy('product_id');
+                }])
+                ->first();
+
+            // Añade la cantidad total de stock directamente al resultado
+            if ($productDetails && $productDetails->stocks->isNotEmpty()) {
+                $productDetails->stock = $productDetails->stocks->first()->total;
+                unset($productDetails->stocks); // Elimina el array stocks si no es necesario
+            }
+
+            return response()->json(["msg" => "Detalles de Producto", "rsp" => $productDetails], 200);
+        }
+
+             $query = Stock::select($columns)
+                ->join('products', 'stocks.product_id', '=', 'products.id');
+
+            if (isset($request->limit)){
+                $query->take($request->limit);
+            }
+            
+            if (isset($request->tipo)){
+                $query->where('stocks.tipo', '=', $request->tipo);
+            }
+            if (isset($request->warehouse_id)){
+                $query->where('products.warehouse_id', '=', $request->warehouse_id);
+            }
+
+            $stock = $query->get();
+
+            return response()->json(["msg"=>"Listando", "rsp"=>$stock], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "error" => $th->getMessage(),
+                "linea" => $th->getLine(),
+                "file" => $th->getFile(),
+                "metodo" => __METHOD__
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function delete(Request $request)
+    {   
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Stock  $stock
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Stock $stock)
-    {
-        //
-    }
+        if (!isset($request->id)){
+            return response()->json([
+                "msg" => "No proporciono el id del stock a eliminar",
+            ], Response::HTTP_BAD_REQUEST);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Stock  $stock
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Stock $stock)
-    {
-        //
-    }
+        try {
+            $stock = Stock::find($request->id);
+            $stock->delete();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Stock  $stock
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Stock $stock)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Stock  $stock
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Stock $stock)
-    {
-        //
-    }
+            return response()->json(["msg"=>"Stock Eliminado"], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "error" => $th->getMessage(),
+                "linea" => $th->getLine(),
+                "file" => $th->getFile(),
+                "metodo" => __METHOD__
+            ], Response::HTTP_BAD_REQUEST);
+        }
+    } 
 }

@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 
-class ListarWarehouseRequest extends FormRequest
+class ListarStockRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,10 +28,10 @@ class ListarWarehouseRequest extends FormRequest
     public function rules()
     {
         return [
+            'product_id' => 'nullable|exists:products,id',
+            'tipo' => 'nullable|in:entrada,salida',
             'limit' => 'nullable|integer',
-            'id' => 'nullable|integer|exists:warehouses,id',
-            'nombre_bodega' => 'nullable|string|max:255',
-            'direccion_bodega' => 'nullable|string|max:255',
+            'warehouse_id' => 'nullable|integer|exists:warehouses,id',
         ];
     }
 
@@ -43,16 +43,17 @@ class ListarWarehouseRequest extends FormRequest
     public function messages()
     {
         return [
-            'limit.integer' => 'El límite debe ser un número entero',
-            'id.integer' => 'El id debe ser un número entero',
-            'id.exists' => 'El id debe existir en la tabla warehouses',
-            'nombre_bodega.string' => 'El nombre de la bodega debe ser un texto',
-            'nombre_bodega.max' => 'El nombre de la bodega debe tener máximo 255 caracteres',
-            'direccion_bodega.string' => 'La dirección de la bodega debe ser un texto',
-            'direccion_bodega.max' => 'La dirección de la bodega debe tener máximo 255 caracteres',
+            'product_id.required' => 'El campo product_id es requerido',
+            'product_id.exists' => 'El campo product_id no existe',
+            'tipo.required' => 'El campo tipo es requerido',
+            'tipo.in' => 'El campo tipo debe ser entrada o salida',
+            'limit.integer' => 'El campo limit debe ser un entero',
+            'warehouse_id.integer' => 'El campo warehouse_id debe ser un entero',
+            'warehouse_id.exists' => 'El campo warehouse_id no existe',
         ];
     }
 
+    
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
