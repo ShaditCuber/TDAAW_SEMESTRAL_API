@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('warehouses', function (Blueprint $table) {
             $table->id();
             $table->string('nombre_bodega');
-            $table->text('descripcion_bodega')->default('No Aplica');
+            $table->string('descripcion_bodega')->default('No Aplica');
             $table->text('direccion_bodega')->nullable();
             $table->timestamps();
         });

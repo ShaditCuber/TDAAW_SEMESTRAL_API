@@ -34,7 +34,7 @@ class ProductRequest extends FormRequest
             'descripcion' => 'string|nullable',
             'precio_unitario' => 'required|numeric',
             'warehouse_id' => 'required|numeric',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg'
+            'imagen' => 'nullable'
         ];
     }
 

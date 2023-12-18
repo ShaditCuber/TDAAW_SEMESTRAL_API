@@ -39,8 +39,8 @@ class ProductController extends Controller
             $productExist = Product::where('nombre', '=', $request->nombre)->first();
             if ($productExist){
                 return response()->json([
-                    "msg" => "El Producto ya existe",
-                ], Response::HTTP_BAD_REQUEST);
+                    "msg" => "El Nombre de Producto ya existe",
+                ], 203);
             }
 
             if (isset($request->descripcion)
@@ -51,9 +51,9 @@ class ProductController extends Controller
                 $product->descripcion = 'No Aplica';
             }
 
-            $path = $request->imagen-> store('public/products');
-            $path = str_replace('public/', '', $path);
-            $product->imagen = asset('storage/'.$path);
+            // $path = $request->imagen-> store('public/products');
+            // $path = str_replace('public/', '', $path);
+            // $product->imagen = asset('storage/'.$path);
 
             $product->precio_unitario = $request->precio_unitario;
             $product->warehouse_id = $request->warehouse_id;
