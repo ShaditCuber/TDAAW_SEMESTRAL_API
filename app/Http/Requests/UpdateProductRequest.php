@@ -31,7 +31,6 @@ class UpdateProductRequest extends FormRequest
             'id' => 'required|integer|exists:products,id',
             'nombre' => 'nullable|string|max:255',
             'descripcion' => 'nullable|string|max:500',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'precio_unitario' => 'nullable|numeric',
         ];
     }
@@ -51,9 +50,6 @@ class UpdateProductRequest extends FormRequest
             'nombre.max' => 'El nombre del producto debe tener un máximo de 255 caracteres',
             'descripcion.string' => 'La descripción del producto debe ser una cadena de caracteres',
             'descripcion.max' => 'La descripción del producto debe tener un máximo de 500 caracteres',
-            'imagen.image' => 'La imagen debe ser un archivo de imagen',
-            'imagen.mimes' => 'La imagen debe ser un archivo de tipo: jpeg, png, jpg, gif, svg',
-            'imagen.max' => 'La imagen debe tener un tamaño máximo de 2048 kilobytes',
             'precio_unitario.numeric' => 'El precio unitario del producto debe ser un número',
         ];
     }

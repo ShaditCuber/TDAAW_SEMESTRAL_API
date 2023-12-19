@@ -32,9 +32,8 @@ class ProductRequest extends FormRequest
             'id' => 'exists:products,id|numeric',
             'nombre' => 'required|string',
             'descripcion' => 'string|nullable',
-            'precio_unitario' => 'required|numeric',
+            'precio_unitario' => 'required|numeric|gt:0',
             'warehouse_id' => 'required|numeric',
-            'imagen' => 'nullable'
         ];
     }
 
@@ -46,9 +45,6 @@ class ProductRequest extends FormRequest
     public function messages()
     {
         return [
-            'imagen.image' => 'La imagen debe ser un archivo de imagen',
-            'imagen.mimes' => 'La imagen debe ser un archivo de tipo: jpeg, png, jpg, gif, svg',
-            'imagen.max' => 'La imagen debe tener un tamaño máximo de 2048 kilobytes',
             'id.numeric' => 'El id del producto debe ser un número',
             'id.exists' => 'El id del producto no existe',
             'id.required' => 'El id del producto es requerido',
@@ -57,6 +53,7 @@ class ProductRequest extends FormRequest
             'descripcion.string' => 'La descripción del producto debe ser una cadena de caracteres',
             'precio_unitario.required' => 'El precio unitario del producto es requerido',
             'precio_unitario.numeric' => 'El precio unitario del producto debe ser un número',
+            'precio_unitario.gt' => 'El precio unitario del producto debe ser mayor a 0',
             'warehouse_id.required' => 'La bodega del producto es requerida',
             'warehouse_id.numeric' => 'La bodega del producto debe ser un número'
         ];

@@ -43,7 +43,6 @@ public function read(ListarStockRequest $request)
         'products.nombre as product_nombre', // Only select necessary product fields
         'products.descripcion as product_descripcion',
         'products.precio_unitario as product_precio_unitario',
-        'products.imagen as product_imagen',
     ];
     $perPage = $request->input('per_page', 10);
 
@@ -51,7 +50,7 @@ public function read(ListarStockRequest $request)
         if (isset($request->product_id)) {
             // Fetch product details and calculate total quantity and amount
             $productDetails = Product::where('id', $request->product_id)
-                ->select('id', 'nombre', 'descripcion', 'precio_unitario', 'warehouse_id', 'imagen')
+                ->select('id', 'nombre', 'descripcion', 'precio_unitario', 'warehouse_id')
                 ->with(['stocks' => function($query) {
                     $query->select('id', 'product_id', 'cantidad', 'observaciones', 'tipo', 'created_at')
                           ->orderBy('created_at', 'desc');

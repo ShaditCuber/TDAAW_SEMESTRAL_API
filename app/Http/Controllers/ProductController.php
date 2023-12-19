@@ -35,13 +35,17 @@ class ProductController extends Controller
 
             $product->nombre = $request->nombre;
             
-            // verificar si el nombre del producto ya existe
-            $productExist = Product::where('nombre', '=', $request->nombre)->first();
+            // verificar si el nombre del producto ya existe en la boega seleccionada
+            $productExist = Product::where('nombre', $request->nombre)
+                ->where('warehouse_id', $request->warehouse_id)
+                ->first();
+            
             if ($productExist){
                 return response()->json([
-                    "msg" => "El Nombre de Producto ya existe",
-                ], 203);
+                    "msg" => "El producto ya existe en la bodega seleccionada",
+                ], Response::HTTP_BAD_REQUEST);
             }
+            
 
             if (isset($request->descripcion)
                 && $request->descripcion != null
@@ -73,8 +77,8 @@ class ProductController extends Controller
 
     public function read(ListarProductosRequest $request)
 {   
-    $columns = ['nombre', 'descripcion', 'precio_unitario', 'warehouse_id','imagen','id'];
-    $perPage = $request->input('per_page', 10); // Default to 15 items per page if not specified
+    $columns = ['nombre', 'descripcion', 'precio_unitario', 'warehouse_id','id'];
+    $perPage = $request->input('per_page', 9); // Default to 15 items per page if not specified
 
     try {
         if (isset($request->limit)) {
@@ -152,11 +156,6 @@ class ProductController extends Controller
                 $product->precio_unitario = $request->precio_unitario;
             }
             
-            // if (isset($request->imagen)){
-            //     $path = $request->imagen-> store('public/products');
-            //     $path = str_replace('public/', '', $path);
-            //     $product->imagen = asset('storage/'.$path);
-            // }
 
             $product->save();
 

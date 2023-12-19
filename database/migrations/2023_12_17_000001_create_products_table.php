@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->string('descripcion')->default('No Aplica');
-            $table->string('imagen')->nullable();
             $table->integer('precio_unitario')->default(0);
             $table->unsignedBigInteger('warehouse_id')->nullable();
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');

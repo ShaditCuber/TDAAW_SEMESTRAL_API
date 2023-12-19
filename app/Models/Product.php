@@ -12,7 +12,7 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'products';
-    protected $fillable = ['nombre', 'descripcion', 'precio_unitario', 'warehouse_id', 'imagen'];
+    protected $fillable = ['nombre', 'descripcion', 'precio_unitario', 'warehouse_id'];
 
     public function warehouse()
     {
