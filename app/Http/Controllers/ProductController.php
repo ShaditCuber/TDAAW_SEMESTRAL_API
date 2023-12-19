@@ -156,6 +156,7 @@ class ProductController extends Controller
                 $product->precio_unitario = $request->precio_unitario;
             }
             
+            
 
             $product->save();
 
