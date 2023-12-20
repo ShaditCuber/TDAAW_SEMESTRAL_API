@@ -59,7 +59,7 @@ class WarehouseController extends Controller
     public function read(ListarWarehouseRequest $request)
     {   
         $columns = ['nombre_bodega', 'descripcion_bodega', 'direccion_bodega','id'];
-
+        $perPage = $request->input('per_page', 9);
         try {
             if (isset($request->limit)){
                 $warehouses = Warehouse::select($columns)->take($request->limit)->get();
@@ -74,8 +74,11 @@ class WarehouseController extends Controller
                 $warehouses = Warehouse::where('direccion_bodega', 'like', '%'.$request->direccion_bodega.'%')->get();
             }
             else{
-                $warehouses = Warehouse::select($columns)->get();
+                $warehouses = Warehouse::select($columns)->paginate($perPage);
             }
+
+            
+
             return response()->json(["msg"=>"Listando", "rsp"=>$warehouses], 200);
         } catch (\Throwable $th) {
             return response()->json([

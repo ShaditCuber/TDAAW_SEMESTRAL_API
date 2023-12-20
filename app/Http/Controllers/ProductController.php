@@ -100,10 +100,7 @@ class ProductController extends Controller
                 ->where('precio_unitario', '=', $request->precio_unitario)
                 ->paginate($perPage);
         } else {
-            // Default case with pagination
             $products = Product::select($columns)->paginate($perPage);
-
-            // You might want to add logic here to append stock quantity
         }
         if (isset($products)) {
             return ProductResource::collection($products);
@@ -155,7 +152,7 @@ class ProductController extends Controller
             if (isset($request->precio_unitario)){
                 $product->precio_unitario = $request->precio_unitario;
             }
-            
+
             
 
             $product->save();
